@@ -135,6 +135,7 @@ const CashierTransactionsPage = () => {
             </div>
           ) : (
             <>
+              {/* Desktop Table View */}
               <div className="transactions-table-wrapper">
                 <table className="transactions-table">
                   <thead>
@@ -166,6 +167,44 @@ const CashierTransactionsPage = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Cards View */}
+              <div className="transactions-cards">
+                {transactions.map((tx) => (
+                  <div key={tx.id} className="transaction-card">
+                    <div className="transaction-card-header">
+                      <span className="transaction-card-id">#{tx.id}</span>
+                      <span className={`transaction-card-points ${tx.points > 0 ? 'positive' : 'negative'}`}>
+                        {tx.points > 0 ? '+' : ''}{tx.points}
+                      </span>
+                    </div>
+                    <div className="transaction-card-body">
+                      <div className="transaction-card-row">
+                        <span className="transaction-card-label">Type:</span>
+                        <span className={`type-badge ${tx.type}`}>
+                          {tx.type.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div className="transaction-card-row">
+                        <span className="transaction-card-label">User:</span>
+                        <span className="transaction-card-value">
+                          {tx.User?.name || tx.User?.utorid || `User #${tx.userId}`}
+                        </span>
+                      </div>
+                      <div className="transaction-card-row">
+                        <span className="transaction-card-label">Date:</span>
+                        <span className="transaction-card-value">{formatDate(tx.time)}</span>
+                      </div>
+                      {tx.note && (
+                        <div className="transaction-card-row">
+                          <span className="transaction-card-label">Note:</span>
+                          <span className="transaction-card-value">{tx.note}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {totalPages > 1 && (

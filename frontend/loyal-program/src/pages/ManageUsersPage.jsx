@@ -161,6 +161,7 @@ const ManageUsersPage = () => {
             <p>Showing {users.length} of {totalCount} users</p>
           </div>
 
+          {/* Desktop Table View */}
           <div className="users-table-wrapper">
             <table className="users-table">
               <thead>
@@ -261,6 +262,113 @@ const ManageUsersPage = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Cards View */}
+          <div className="users-cards">
+            {users.map((user) => (
+              <div key={user.id} className="user-card">
+                <div className="user-card-header">
+                  <div>
+                    <div className="user-card-name">
+                      {editingUser === user.id ? (
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          className="edit-input"
+                        />
+                      ) : (
+                        user.name
+                      )}
+                    </div>
+                    <div style={{fontSize: '0.85rem', color: '#666', marginTop: '0.25rem'}}>
+                      {user.utorid}
+                    </div>
+                  </div>
+                  <span className={`role-badge ${user.role}`}>{user.role}</span>
+                </div>
+                <div className="user-card-body">
+                  <div className="user-card-row">
+                    <span className="user-card-label">ID:</span>
+                    <span className="user-card-value">{user.id}</span>
+                  </div>
+                  {editingUser === user.id ? (
+                    <>
+                      <div className="user-card-row">
+                        <span className="user-card-label">Role:</span>
+                        <select
+                          value={formData.role}
+                          onChange={(e) => setFormData({...formData, role: e.target.value})}
+                          className="edit-select"
+                        >
+                          <option value="regular">Regular</option>
+                          <option value="cashier">Cashier</option>
+                          <option value="manager">Manager</option>
+                          <option value="superuser">Superuser</option>
+                        </select>
+                      </div>
+                      <div className="user-card-row">
+                        <span className="user-card-label">Points:</span>
+                        <input
+                          type="number"
+                          value={formData.points}
+                          onChange={(e) => setFormData({...formData, points: parseInt(e.target.value)})}
+                          className="edit-input small"
+                        />
+                      </div>
+                      <div className="user-card-row">
+                        <span className="user-card-label">Verified:</span>
+                        <input
+                          type="checkbox"
+                          checked={formData.verified}
+                          onChange={(e) => setFormData({...formData, verified: e.target.checked})}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="user-card-row">
+                        <span className="user-card-label">Points:</span>
+                        <span className="user-card-value">{user.points}</span>
+                      </div>
+                      <div className="user-card-row">
+                        <span className="user-card-label">Verified:</span>
+                        <span className={`user-card-value ${user.verified ? 'verified' : 'unverified'}`}>
+                          {user.verified ? 'Yes' : 'No'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="user-card-footer">
+                  {editingUser === user.id ? (
+                    <div className="action-buttons">
+                      <button
+                        onClick={() => handleSaveEdit(user.id)}
+                        className="save-btn"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="cancel-btn"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="edit-btn"
+                      style={{width: '100%'}}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
 
           {totalPages > 1 && (

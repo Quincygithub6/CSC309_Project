@@ -221,6 +221,58 @@
   font-size: 0.95rem;
 }
 
+/* Mobile Cards View */
+.transactions-cards {
+  display: none;
+}
+
+.transaction-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.transaction-card-amount {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.transaction-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transaction-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.transaction-card-label {
+  font-weight: 600;
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}
+
+.transaction-card-value {
+  color: #2c3e50;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .transactions-table {
@@ -252,12 +304,13 @@
     width: 100%;
   }
 
+  /* Hide table, show cards on mobile */
   .transactions-table-container {
-    overflow-x: scroll;
+    display: none;
   }
 
-  .transactions-table {
-    min-width: 800px;
+  .transactions-cards {
+    display: block;
   }
 
   .pagination {

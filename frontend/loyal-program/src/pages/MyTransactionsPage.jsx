@@ -155,7 +155,7 @@ const MyTransactionsPage = () => {
         </div>
       ) : (
         <>
-          {/* Transactions Table */}
+          {/* Transactions Table (Desktop) */}
           <div className="transactions-table-container">
             <table className="transactions-table">
               <thead>
@@ -205,6 +205,54 @@ const MyTransactionsPage = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Transactions Cards (Mobile) */}
+          <div className="transactions-cards">
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="transaction-card">
+                <div className="transaction-card-header">
+                  <span className={`type-badge type-${transaction.type}`}>
+                    {getTransactionTypeLabel(transaction.type)}
+                  </span>
+                  <span className={`transaction-card-amount ${getTransactionClass(transaction.amount)}`}>
+                    {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+                  </span>
+                </div>
+                <div className="transaction-card-body">
+                  <div className="transaction-card-row">
+                    <span className="transaction-card-label">Date:</span>
+                    <span className="transaction-card-value">{formatDate(transaction.createdAt)}</span>
+                  </div>
+                  {transaction.spent && (
+                    <div className="transaction-card-row">
+                      <span className="transaction-card-label">Spent:</span>
+                      <span className="transaction-card-value">${transaction.spent.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {transaction.remark && (
+                    <div className="transaction-card-row">
+                      <span className="transaction-card-label">Remark:</span>
+                      <span className="transaction-card-value">{transaction.remark}</span>
+                    </div>
+                  )}
+                  <div className="transaction-card-row">
+                    <span className="transaction-card-label">Status:</span>
+                    <div className="status-indicators">
+                      {transaction.processed && (
+                        <span className="status-badge processed">Processed</span>
+                      )}
+                      {transaction.suspicious && (
+                        <span className="status-badge suspicious">Suspicious</span>
+                      )}
+                      {!transaction.processed && !transaction.suspicious && (
+                        <span className="status-badge normal">Normal</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Pagination */}
