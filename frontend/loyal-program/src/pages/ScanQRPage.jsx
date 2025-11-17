@@ -18,7 +18,7 @@ const ScanQRPage = () => {
     
     try {
       const data = JSON.parse(e.target.value);
-      if (data.type === 'user' && data.userId) {
+      if ((data.type === 'user' && data.userId) || (data.type === 'redemption' && data.requestId)) {
         setUserInfo(data);
       }
     } catch (err) {
@@ -46,6 +46,19 @@ const ScanQRPage = () => {
       
       const qrData = JSON.parse(qrInput);
       
+      // Handle redemption requests
+      if (qrData.type === 'redemption' && qrData.requestId) {
+        await transactionAPI.processRedemption(qrData.requestId);
+        setSuccess(true);
+        setQrInput('');
+        setPoints('');
+        setNote('');
+        setUserInfo(null);
+        setTimeout(() => setSuccess(false), 3000);
+        return;
+      }
+      
+      // Handle regular user QR for awarding points
       if (qrData.type !== 'user' || !qrData.userId) {
         setError('Invalid QR code format');
         return;
@@ -68,8 +81,8 @@ const ScanQRPage = () => {
       }, 3000);
 
     } catch (err) {
-      console.error('Error awarding points:', err);
-      setError(err.response?.data?.error || 'Failed to award points. Please try again.');
+      console.error('Error processing request:', err);
+      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to process request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -82,13 +95,13 @@ const ScanQRPage = () => {
       <div className="scan-container">
         <div className="scan-card">
           <div className="scan-header">
-            <h2>Award Points via QR Code</h2>
-            <p>Scan the user's QR code to award points</p>
+            <h2>Scan QR Code</h2>
+            <p>Scan user QR to award points or redemption request QR to process redemption</p>
           </div>
 
           {success && (
             <div className="success-banner">
-              Points awarded successfully!
+              {userInfo?.type === 'redemption' ? 'Redemption processed successfully!' : 'Points awarded successfully!'}
             </div>
           )}
 
@@ -115,11 +128,20 @@ const ScanQRPage = () => {
               </p>
             </div>
 
-            {userInfo && (
+            {userInfo && userInfo.type === 'user' && (
               <div className="user-info-card">
                 <h3>User Information</h3>
                 <p><strong>UTORid:</strong> {userInfo.utorid}</p>
                 <p><strong>User ID:</strong> {userInfo.userId}</p>
+              </div>
+            )}
+
+            {userInfo && userInfo.type === 'redemption' && (
+              <div className="user-info-card redemption-info">
+                <h3>Redemption Request</h3>
+                <p><strong>Request ID:</strong> {userInfo.requestId}</p>
+                <p><strong>Points to Redeem:</strong> {userInfo.amount}</p>
+                <p className="warning-text">Click "Process Redemption" to complete this request</p>
               </div>
             )}
 
@@ -133,9 +155,12 @@ const ScanQRPage = () => {
                 value={points}
                 onChange={(e) => setPoints(e.target.value)}
                 placeholder="Enter points amount"
-                disabled={loading}
-                required
+                disabled={loading || (userInfo?.type === 'redemption')}
+                required={userInfo?.type !== 'redemption'}
               />
+              {userInfo?.type === 'redemption' && (
+                <p className="field-hint">Points field not needed for redemption requests</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -146,9 +171,12 @@ const ScanQRPage = () => {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Add a note for this transaction"
-                disabled={loading}
+                disabled={loading || (userInfo?.type === 'redemption')}
                 maxLength={200}
               />
+              {userInfo?.type === 'redemption' && (
+                <p className="field-hint">Note field not needed for redemption requests</p>
+              )}
             </div>
 
             <button 
@@ -156,18 +184,26 @@ const ScanQRPage = () => {
               className="submit-btn"
               disabled={loading || !userInfo}
             >
-              {loading ? 'Awarding Points...' : 'Award Points'}
+              {loading ? 'Processing...' : (userInfo?.type === 'redemption' ? 'Process Redemption' : 'Award Points')}
             </button>
           </form>
 
           <div className="help-section">
             <h3>How to use:</h3>
+            <h4>For awarding points:</h4>
             <ol>
               <li>Ask the user to show their QR code from "My QR Code" page</li>
               <li>In a real app, scan it with camera. For testing, copy and paste the QR data</li>
               <li>Enter the number of points to award</li>
               <li>Optionally add a note</li>
               <li>Click "Award Points" to complete the transaction</li>
+            </ol>
+            <h4>For processing redemptions:</h4>
+            <ol>
+              <li>Ask the user to show their redemption request QR code</li>
+              <li>Scan or paste the redemption QR data</li>
+              <li>Verify the request details</li>
+              <li>Click "Process Redemption" to complete</li>
             </ol>
           </div>
         </div>

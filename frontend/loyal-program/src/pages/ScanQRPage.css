@@ -119,15 +119,39 @@
   padding: 1rem;
 }
 
+.user-info-card.redemption-info {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+}
+
 .user-info-card h3 {
   margin: 0 0 0.75rem 0;
   color: #0c5460;
   font-size: 1rem;
 }
 
+.user-info-card.redemption-info h3 {
+  color: #856404;
+}
+
 .user-info-card p {
   margin: 0.5rem 0;
   color: #0c5460;
+}
+
+.user-info-card.redemption-info p {
+  color: #856404;
+}
+
+.warning-text {
+  font-weight: 600;
+  margin-top: 0.75rem !important;
+}
+
+.help-section h4 {
+  margin: 1rem 0 0.5rem 0;
+  color: #555;
+  font-size: 1rem;
 }
 
 .submit-btn {

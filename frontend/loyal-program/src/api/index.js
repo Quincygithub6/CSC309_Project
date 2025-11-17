@@ -69,8 +69,16 @@ export const transactionAPI = {
     apiClient.post('/transactions', data),
   
   // Create redemption transaction
-  createRedemption: (amount) => 
-    apiClient.post('/users/me/transactions', { amount }),
+  createRedemption: (amount, remark) => 
+    apiClient.post('/users/me/transactions', { amount, remark }),
+  
+  // Process redemption transaction (cashier/manager/superuser)
+  processRedemption: (transactionId) => 
+    apiClient.patch(`/transactions/${transactionId}/processed`),
+  
+  // Get redemption by ID
+  getRedemptionById: (transactionId) => 
+    apiClient.get(`/transactions/${transactionId}`),
   
   // Create transfer transaction
   createTransfer: (toUserId, amount) => 
@@ -93,6 +101,23 @@ export const eventAPI = {
   // Get all events
   getEvents: (params) => 
     apiClient.get('/events', { params }),
+  
+  // Get events where I am an organizer
+  getMyOrganizedEvents: () => 
+    apiClient.get('/events')
+      .then(res => {
+        // Filter events where current user is an organizer
+        const events = res.data?.results || res.data || [];
+        return { 
+          ...res, 
+          data: {
+            ...res.data,
+            results: events.filter(event => 
+              event.organizers && event.organizers.length > 0
+            )
+          }
+        };
+      }),
   
   // Get event by ID
   getEventById: (eventId) => 
@@ -129,6 +154,10 @@ export const eventAPI = {
   // Remove guest from event (organizer/manager/superuser)
   removeEventGuest: (eventId, userId) => 
     apiClient.delete(`/events/${eventId}/guests/${userId}`),
+  
+  // Award points to event attendees (organizer/manager/superuser)
+  awardEventPoints: (eventId, data) => 
+    apiClient.post(`/events/${eventId}/transactions`, data),
 };
 
 // ===== Promotion APIs =====

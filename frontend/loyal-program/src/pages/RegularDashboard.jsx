@@ -151,6 +151,9 @@ const RegularDashboard = () => {
           <a href="/promotions" className="action-btn">
             View Promotions
           </a>
+          <a href="/redemptions/create" className="action-btn">
+            Create Redemption
+          </a>
           <a href="/transfer" className="action-btn">
             Transfer Points
           </a>

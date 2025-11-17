@@ -19,6 +19,9 @@ import EventDetailPage from './pages/EventDetailPage';
 import MyTransactionsPage from './pages/MyTransactionsPage';
 import MyQRCodePage from './pages/MyQRCodePage';
 import TransferPage from './pages/TransferPage';
+import CreateRedemptionPage from './pages/CreateRedemptionPage';
+import MyRedemptionsPage from './pages/MyRedemptionsPage';
+import ProfilePage from './pages/ProfilePage';
 
 const App = () => {
   return (
@@ -31,6 +34,9 @@ const App = () => {
             
             {/* Protected routes */}
             <Route element={<RequireAuth />}>
+              {/* Common routes for all authenticated users */}
+              <Route path="/profile" element={<ProfilePage />} />
+              
               {/* Regular user routes */}
               <Route path="/dashboard" element={<RegularDashboard />} />
               <Route path="/promotions" element={<PromotionsPage />} />
@@ -39,6 +45,8 @@ const App = () => {
               <Route path="/transactions" element={<MyTransactionsPage />} />
               <Route path="/my-qr" element={<MyQRCodePage />} />
               <Route path="/transfer" element={<TransferPage />} />
+              <Route path="/redemptions" element={<MyRedemptionsPage />} />
+              <Route path="/redemptions/create" element={<CreateRedemptionPage />} />
               
               {/* Cashier routes */}
               <Route path="/cashier" element={<CashierDashboard />} />

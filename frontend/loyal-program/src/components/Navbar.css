@@ -56,6 +56,22 @@
   gap: 1rem;
 }
 
+.profile-link {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.profile-link:hover {
+  color: #3498db;
+}
+
+.user-role {
+  color: #95a5a6;
+  font-size: 0.85rem;
+}
+
 .user-info {
   color: #ecf0f1;
   font-size: 0.9rem;
@@ -76,20 +92,102 @@
   background-color: #c0392b;
 }
 
+/* Mobile menu toggle button */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 25px;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+    order: 2;
+  }
+
   .navbar-container {
-    flex-direction: column;
-    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .navbar-brand {
+    order: 1;
+    flex: 1;
   }
 
   .navbar-menu {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: none;
+    order: 3;
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    background-color: #34495e;
+    border-radius: 4px;
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+
+  .navbar-menu.mobile-open {
+    display: flex;
+  }
+
+  .nav-link {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
   }
 
   .navbar-user {
+    display: none;
+    order: 4;
     width: 100%;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar-user.mobile-open {
+    display: flex;
+  }
+
+  .logout-btn {
+    width: 100%;
   }
 }
