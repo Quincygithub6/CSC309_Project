@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { userAPI, transactionAPI, eventAPI, promotionAPI } from '../api';
 import './ManagerDashboard.css';
@@ -112,25 +113,25 @@ const ManagerDashboard = () => {
       <div className="quick-actions-section">
         <h2 className="section-title">Quick Actions</h2>
         <div className="actions-grid">
-          <a href="/manager/users" className="action-card">
+          <Link to="/manager/users" className="action-card">
             <h3>Manage Users</h3>
             <p>View and edit user accounts</p>
-          </a>
+          </Link>
 
-          <a href="/manager/events" className="action-card">
+          <Link to="/manager/events" className="action-card">
             <h3>Manage Events</h3>
             <p>Create and manage events</p>
-          </a>
+          </Link>
 
-          <a href="/manager/promotions" className="action-card">
+          <Link to="/manager/promotions" className="action-card">
             <h3>Manage Promotions</h3>
             <p>Create and manage promotions</p>
-          </a>
+          </Link>
 
-          <a href="/manager/transactions" className="action-card">
+          <Link to="/manager/transactions" className="action-card">
             <h3>View Transactions</h3>
             <p>Monitor all transactions</p>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

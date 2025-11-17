@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { userAPI, transactionAPI } from '../api';
 import './RegularDashboard.css';
@@ -136,7 +137,7 @@ const RegularDashboard = () => {
 
         {recentTransactions.length > 0 && (
           <div className="view-all-link">
-            <a href="/transactions">View All Transactions →</a>
+            <Link to="/transactions">View All Transactions →</Link>
           </div>
         )}
       </div>
@@ -145,21 +146,21 @@ const RegularDashboard = () => {
       <div className="quick-actions">
         <h2 className="section-title">Quick Actions</h2>
         <div className="action-buttons">
-          <a href="/events" className="action-btn">
+          <Link to="/events" className="action-btn">
             Browse Events
-          </a>
-          <a href="/promotions" className="action-btn">
+          </Link>
+          <Link to="/promotions" className="action-btn">
             View Promotions
-          </a>
-          <a href="/redemptions/create" className="action-btn">
+          </Link>
+          <Link to="/redemptions/create" className="action-btn">
             Create Redemption
-          </a>
-          <a href="/transfer" className="action-btn">
+          </Link>
+          <Link to="/transfer" className="action-btn">
             Transfer Points
-          </a>
-          <a href="/my-qr" className="action-btn">
+          </Link>
+          <Link to="/my-qr" className="action-btn">
             My QR Code
-          </a>
+          </Link>
         </div>
       </div>
     </div>

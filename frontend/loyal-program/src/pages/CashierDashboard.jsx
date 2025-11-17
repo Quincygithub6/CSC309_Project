@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { transactionAPI } from '../api';
 import './CashierDashboard.css';
@@ -115,15 +116,15 @@ const CashierDashboard = () => {
       <div className="quick-actions">
         <h2 className="section-title">Quick Actions</h2>
         <div className="action-buttons">
-          <a href="/cashier/scan" className="action-btn primary">
+          <Link to="/cashier/scan" className="action-btn primary">
             Scan QR Code
-          </a>
-          <a href="/cashier/manual-award" className="action-btn">
+          </Link>
+          <Link to="/cashier/manual-award" className="action-btn">
             Manual Award
-          </a>
-          <a href="/cashier/transactions" className="action-btn">
+          </Link>
+          <Link to="/cashier/transactions" className="action-btn">
             View All Transactions
-          </a>
+          </Link>
         </div>
       </div>
 
