@@ -197,6 +197,7 @@ const getEvents = async (req, res, next) => {
       const common = {
         id: event.id,
         name: event.name,
+        description: event.description,
         location: event.location,
         startTime: event.startTime,
         endTime: event.endTime,
