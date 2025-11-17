@@ -46,11 +46,11 @@ const Navbar = () => {
     if (role === 'manager' || role === 'superuser') {
       return (
         <>
-          <Link to="/manager" className="nav-link">Home</Link>
+          <Link to="/manager" className="nav-link">Dashboard</Link>
           <Link to="/manager/users" className="nav-link">Users</Link>
-          <Link to="/manager/transactions" className="nav-link">Transactions</Link>
           <Link to="/manager/events" className="nav-link">Events</Link>
           <Link to="/manager/promotions" className="nav-link">Promotions</Link>
+          <Link to="/manager/transactions" className="nav-link">Transactions</Link>
         </>
       );
     }

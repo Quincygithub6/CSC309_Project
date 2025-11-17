@@ -9,8 +9,10 @@ import CashierDashboard from './pages/CashierDashboard';
 import ScanQRPage from './pages/ScanQRPage';
 import ManualAwardPage from './pages/ManualAwardPage';
 import CashierTransactionsPage from './pages/CashierTransactionsPage';
-import CashierHome from './pages/CashierHome';
-import ManagerHome from './pages/ManagerHome';
+import ManagerDashboard from './pages/ManagerDashboard';
+import ManageUsersPage from './pages/ManageUsersPage';
+import ManageEventsPage from './pages/ManageEventsPage';
+import ManagePromotionsPage from './pages/ManagePromotionsPage';
 import PromotionsPage from './pages/PromotionsPage';
 import EventsListPage from './pages/EventsListPage';
 import EventDetailPage from './pages/EventDetailPage';
@@ -45,7 +47,11 @@ const App = () => {
               <Route path="/cashier/transactions" element={<CashierTransactionsPage />} />
               
               {/* Manager/Superuser routes */}
-              <Route path="/manager" element={<ManagerHome />} />
+              <Route path="/manager" element={<ManagerDashboard />} />
+              <Route path="/manager/users" element={<ManageUsersPage />} />
+              <Route path="/manager/events" element={<ManageEventsPage />} />
+              <Route path="/manager/promotions" element={<ManagePromotionsPage />} />
+              <Route path="/manager/transactions" element={<CashierTransactionsPage />} />
             </Route>
             
             {/* Default redirect */}
