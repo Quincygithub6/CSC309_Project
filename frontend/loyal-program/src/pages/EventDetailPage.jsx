@@ -33,7 +33,8 @@ const EventDetailPage = () => {
           setGuests(guestsList);
           
           // Check if current user is in the guests list
-          const userIsGuest = guestsList.some(guest => guest.userId === user?.id);
+          const userIsGuest = guestsList.some(guest => guest.utorid === user?.utorid);
+
           setIsRsvped(userIsGuest);
         } catch (guestsErr) {
           // User might not have permission to view guests, that's ok
@@ -52,27 +53,46 @@ const EventDetailPage = () => {
   }, [eventId, user]);
 
   const handleRSVP = async () => {
-    try {
-      setActionLoading(true);
-      setError('');
-      setSuccessMessage('');
-      
-      await eventAPI.rsvpEvent(eventId);
+  setActionLoading(true);
+  setError('');
+  setSuccessMessage('');
+
+  try {
+    // try RSVP
+    await eventAPI.rsvpEvent(eventId);
+
+    // if successful, update state
+    setIsRsvped(true);
+    setSuccessMessage("Successfully RSVP'd to this event!");
+
+  } catch (err) {
+    console.error("Error RSVP'ing to event:", err);
+
+    const rawMsg = err.response?.data?.error;
+    const serverMsg = rawMsg?.toLowerCase() || "";
+
+    // fallback: if server says already on guest list, treat as RSVP success
+    if (serverMsg.includes("already") && serverMsg.includes("guest")) {
       setIsRsvped(true);
-      setSuccessMessage('Successfully RSVP\'d to this event!');
-      
-      // Refresh event details
+      setSuccessMessage("You have already RSVP'd to this event.");
+      setError('');
+    } else {
+      setError(rawMsg || "Failed to RSVP. Please try again.");
+    }
+
+  } finally {
+    setActionLoading(false);
+
+    // Regardless of success/failure, try to refresh event details
+    try {
       const eventResponse = await eventAPI.getEventById(eventId);
       setEvent(eventResponse.data);
-      
-    } catch (err) {
-      console.error('Error RSVP\'ing to event:', err);
-      const errorMsg = err.response?.data?.error || 'Failed to RSVP. Please try again.';
-      setError(errorMsg);
-    } finally {
-      setActionLoading(false);
+    } catch {
+      console.warn("Could not refresh event details");
     }
-  };
+  }
+};
+
 
   const handleCancelRSVP = async () => {
     try {
