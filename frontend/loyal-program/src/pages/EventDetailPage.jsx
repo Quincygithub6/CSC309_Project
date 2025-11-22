@@ -108,9 +108,16 @@ const EventDetailPage = () => {
     });
   };
 
-  const isEventUpcoming = (startTime) => {
-    return new Date(startTime) > new Date();
-  };
+
+  const getEventStatus = (startTime, endTime) => {
+    const now = new Date();
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (now < start) return "upcoming";
+    if (now > end) return "past";
+    return "ongoing";
+};
 
   if (loading) {
     return (
@@ -135,7 +142,10 @@ const EventDetailPage = () => {
     );
   }
 
-  const isUpcoming = isEventUpcoming(event.startTime);
+  const status = getEventStatus(event.startTime, event.endTime);
+
+  const canRSVP = status === "upcoming" || status === "ongoing";
+
 
   return (
     <div className="page-container">
@@ -146,9 +156,12 @@ const EventDetailPage = () => {
       <div className="event-detail-card">
         <div className="event-detail-header">
           <h1 className="event-detail-title">{event.name}</h1>
-          <span className={`event-status-badge ${isUpcoming ? 'upcoming' : 'past'}`}>
-            {isUpcoming ? 'Upcoming' : 'Past Event'}
+          <span className={`event-status-badge ${status}`}>
+            {status === "upcoming" && "Upcoming"}
+            {status === "ongoing" && "Ongoing"}
+            {status === "past" && "Past Event"}
           </span>
+
         </div>
 
         {error && (
@@ -214,7 +227,7 @@ const EventDetailPage = () => {
           </div>
 
           {/* RSVP Section */}
-          {isUpcoming && (
+          {canRSVP && (
             <div className="rsvp-section">
               {isRsvped ? (
                 <div className="rsvp-confirmed">
