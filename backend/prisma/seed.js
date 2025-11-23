@@ -21,6 +21,7 @@ async function main() {
   await prisma.transaction.deleteMany();
   await prisma.promotion.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.event.deleteMany();
 
 
   // ==========================================================

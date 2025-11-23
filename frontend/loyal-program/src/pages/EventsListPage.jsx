@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { eventAPI } from '../api';
 import './EventsListPage.css';
+import { useAuth } from '../hooks/useAuth';
 
 // ========== Helper functions ==========
-
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -109,6 +109,8 @@ const EventCard = ({ event }) => {
 // ========== Main page component ==========
 
 const EventsListPage = () => {
+  const { user } = useAuth();
+  
   const [events, setEvents] = useState([]);
   const [organizedEvents, setOrganizedEvents] = useState([]);
   const [activeTab, setActiveTab] = useState('all'); // 'all' or 'organized'
@@ -137,7 +139,8 @@ const fetchOrganizedEvents = async () => {
     setLoading(true);
     setError('');
 
-    const response = await eventAPI.getMyOrganizedEvents();
+    const response = await eventAPI.getMyOrganizedEvents(user.id);
+    console.log(response);
 
     const eventsData = response.data?.results || response.data || [];
     setOrganizedEvents(eventsData);
