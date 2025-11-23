@@ -70,7 +70,7 @@ export const transactionAPI = {
   
   // Create redemption transaction
   createRedemption: (amount, remark) => 
-    apiClient.post('/users/me/transactions', { amount, remark }),
+    apiClient.post('/users/me/transactions', { type: "redemption", amount, remark }),
   
   // Process redemption transaction (cashier/manager/superuser)
   processRedemption: (transactionId) => 
@@ -81,8 +81,12 @@ export const transactionAPI = {
     apiClient.get(`/transactions/${transactionId}`),
   
   // Create transfer transaction
-  createTransfer: (toUserId, amount) => 
-    apiClient.post(`/users/${toUserId}/transactions`, { amount }),
+  createTransfer: (toUserId, amount, remark) => 
+    apiClient.post(`/users/${toUserId}/transactions`, {
+      type: "transfer",
+      amount: Number(amount),
+      remark: remark
+    }),
   
   // Award points (cashier/manager/superuser only)
   awardPoints: (data) => 
