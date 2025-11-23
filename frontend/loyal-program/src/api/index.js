@@ -73,8 +73,8 @@ export const transactionAPI = {
     apiClient.post('/users/me/transactions', { type: "redemption", amount, remark }),
   
   // Process redemption transaction (cashier/manager/superuser)
-  processRedemption: (transactionId) => 
-    apiClient.patch(`/transactions/${transactionId}/processed`),
+  processRedemption: (transactionId, payload) => 
+    apiClient.patch(`/transactions/${transactionId}/processed`, payload),
   
   // Get redemption by ID
   getRedemptionById: (transactionId) => 
