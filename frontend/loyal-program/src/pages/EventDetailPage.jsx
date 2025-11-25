@@ -137,6 +137,123 @@ function OrganizerAddGuestSection({
 }
 
 
+
+/**
+ * Organizer Award Points Section
+ *
+ * Allows organizers to award points to a single guest (by UTORid)
+ * or to all guests who have RSVPed to this event.
+ * This corresponds to POST /events/:eventId/transactions with type "event".
+ */
+function OrganizerAwardPointsSection({
+  canAwardPoints,
+  awardMode,
+  setAwardMode,
+  awardUtorid,
+  setAwardUtorid,
+  awardAmount,
+  setAwardAmount,
+  pointsRemain,
+  actionLoading,
+  handleAwardPoints,
+}) {
+  if (!canAwardPoints) return null;
+
+  const remainingLabel =
+    pointsRemain !== undefined && pointsRemain >= 0
+      ? `Points remaining for this event: ${pointsRemain}`
+      : null;
+
+  return (
+    <div className="event-award-points-section">
+      <h3>Award Points to Guests</h3>
+
+      {remainingLabel && (
+        <p className="helper-text">
+          {remainingLabel}
+        </p>
+      )}
+
+      <form onSubmit={handleAwardPoints} className="event-form award-points-form">
+        {/* Choose award mode: single guest vs all guests */}
+        <div className="form-row">
+          <div className="form-group">
+            <label>Award Mode</label>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  name="award-mode"
+                  value="single"
+                  checked={awardMode === 'single'}
+                  onChange={() => setAwardMode('single')}
+                />
+                Single guest (by UTORid)
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="award-mode"
+                  value="all"
+                  checked={awardMode === 'all'}
+                  onChange={() => setAwardMode('all')}
+                />
+                All guests who have RSVP&apos;d
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Only show UTORid input when awarding to a single guest */}
+        {awardMode === 'single' && (
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="award-guest-utorid">Guest UTORid</label>
+              <input
+                id="award-guest-utorid"
+                type="text"
+                value={awardUtorid}
+                onChange={(e) => setAwardUtorid(e.target.value)}
+                placeholder="e.g., jdoe123"
+                required
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Amount is always required */}
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="award-amount">Points to Award</label>
+            <input
+              id="award-amount"
+              type="number"
+              min="1"
+              value={awardAmount}
+              onChange={(e) => setAwardAmount(e.target.value)}
+              placeholder="Positive integer, e.g., 50"
+              required
+            />
+            <p className="helper-text">
+              For &quot;All guests&quot;, this amount is per guest.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="submit-btn"
+          disabled={actionLoading}
+        >
+          {actionLoading ? 'Awarding...' : 'Award Points'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+
+
 /** Organizer Edit Event Section
  *
  * Renders the edit button and form for organizers to edit event details.
@@ -303,6 +420,11 @@ const EventDetailPage = () => {
     endTime: '',
     capacity: ''
   });
+
+   // Award Points state
+  const [awardMode, setAwardMode] = useState('single'); // 'single' | 'all'
+  const [awardUtorid, setAwardUtorid] = useState('');
+  const [awardAmount, setAwardAmount] = useState('');
 
   const fetchEventDetails = async ({ showPageLoader = true } = {}) => {
   try {
@@ -497,6 +619,68 @@ const EventDetailPage = () => {
   };
 
 
+    /**
+   * Handle organizer awarding points to guests.
+   * Uses POST /events/:eventId/transactions with type "event".
+   * If awardMode === 'single', we send utorid to award points to one guest.
+   * If awardMode === 'all', we omit utorid to award the same amount to all guests.
+   */
+  const handleAwardPoints = async (e) => {
+    e.preventDefault();
+
+    const trimmedUtorid = awardUtorid.trim();
+    const amountNum = parseInt(awardAmount, 10);
+
+    if (!amountNum || amountNum <= 0) {
+      setError('Please enter a positive points amount.');
+      return;
+    }
+
+    if (awardMode === 'single' && !trimmedUtorid) {
+      setError('Please enter a guest UTORid.');
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+
+      const payload = {
+        type: 'event',
+        amount: amountNum,
+      };
+
+      if (awardMode === 'single') {
+        payload.utorid = trimmedUtorid;
+      }
+      
+      await eventAPI.awardEventPoints(eventId, payload);
+
+      setSuccessMessage(
+        awardMode === 'single'
+          ? 'Points awarded to the guest successfully.'
+          : 'Points awarded to all guests successfully.'
+      );
+
+      // Reset the form
+      setAwardUtorid('');
+      setAwardAmount('');
+
+      // Refresh event details so that pointsRemain/pointsAwarded update
+      await fetchEventDetails({ showPageLoader: false });
+    } catch (err) {
+      console.error('Error awarding points:', err);
+      const errorMsg =
+        err.response?.data?.error ||
+        'Failed to award points. Please try again.';
+      setError(errorMsg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+
 
   /**
    * Handle organizer updating event details.
@@ -582,6 +766,8 @@ const EventDetailPage = () => {
   const canRSVP = !userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
   const canAddGuest = userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
   const canEditEvent = userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
+  const canAwardPoints = userIsOrganizer && event.pointsRemain !== undefined;
+
 
 
   return (
@@ -704,7 +890,7 @@ const EventDetailPage = () => {
           {renderRSVPSection(canRSVP, isRsvped, actionLoading, handleRSVP, handleCancelRSVP)}
 
 
-          {/* Organizer Add Guest Section (shown only to organizers) */}
+          {/* Organizer Add Guest Section */}
           <OrganizerAddGuestSection
             canAddGuest={canAddGuest}
             addGuestUtorid={addGuestUtorid}
@@ -714,6 +900,19 @@ const EventDetailPage = () => {
           />
 
           {/* Organizer Award Points Section */}
+          <OrganizerAwardPointsSection
+            canAwardPoints={canAwardPoints}
+            awardMode={awardMode}
+            setAwardMode={setAwardMode}
+            awardUtorid={awardUtorid}
+            setAwardUtorid={setAwardUtorid}
+            awardAmount={awardAmount}
+            setAwardAmount={setAwardAmount}
+            pointsRemain={event.pointsRemain}
+            actionLoading={actionLoading}
+            handleAwardPoints={handleAwardPoints}
+          />
+
 
 
           {/* Organizers Edit Event Section */}

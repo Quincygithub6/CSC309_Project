@@ -209,8 +209,26 @@
   cursor: not-allowed;
 }
 
+/* Add Guest Section */
+.event-add-guest-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Award Points Section */
+.event-award-points-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+} 
+
 /* Organizer Edit Event Section */
-.edit-form-section {
+.event-edit-section {
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
