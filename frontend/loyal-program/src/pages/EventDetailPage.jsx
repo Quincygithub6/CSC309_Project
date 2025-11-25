@@ -90,12 +90,59 @@ function renderRSVPSection(canRSVP, isRsvped, actionLoading, handleRSVP, handleC
   );
 }
 
+
+/**
+ * Organizer Add Guest Section
+ *
+ * Renders a small form for organizers to add a guest by utorid.
+ */
+function OrganizerAddGuestSection({
+  canAddGuest,
+  addGuestUtorid,
+  setAddGuestUtorid,
+  actionLoading,
+  handleAddGuest,
+}) {
+  if (!canAddGuest) return null;
+
+  return (
+    <div className="event-add-guest-section">
+      <h3>Add a Guest</h3>
+
+      <form onSubmit={handleAddGuest} className="event-form add-guest-form">
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="add-guest-utorid">Guest UTORid</label>
+            <input
+              id="add-guest-utorid"
+              type="text"
+              value={addGuestUtorid}
+              onChange={(e) => setAddGuestUtorid(e.target.value)}
+              placeholder="e.g., jdoe123"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="submit-btn"
+          disabled={actionLoading}
+        >
+          {actionLoading ? 'Adding...' : 'Add Guest'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+
 /** Organizer Edit Event Section
  *
  * Renders the edit button and form for organizers to edit event details.
  */
 function OrganizerEditEventSection({
-  userIsOrganizer,
+  canEditEvent,
   showEditForm,
   toggleEditForm,
   editFormData,
@@ -103,7 +150,7 @@ function OrganizerEditEventSection({
   actionLoading,
   handleUpdateEvent,
 }) {
-  if (!userIsOrganizer) return null;
+  if (!canEditEvent) return null;
 
   return (
     <div className="event-edit-section">
@@ -241,6 +288,10 @@ const EventDetailPage = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Add Guest state
+  const [addGuestUtorid, setAddGuestUtorid] = useState('');
+
 
   // Organizer edit form state
   const [showEditForm, setShowEditForm] = useState(false);
@@ -411,6 +462,42 @@ const EventDetailPage = () => {
   };
 
 
+    /**
+   * Handle organizer adding a guest by utorid.
+   * Uses POST /events/:eventId/guests.
+   */
+  const handleAddGuest = async (e) => {
+    e.preventDefault();
+
+    const trimmed = addGuestUtorid.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setError('');
+      setSuccessMessage('');
+
+      await eventAPI.addEventGuest(eventId, trimmed);
+
+      setSuccessMessage('Guest added successfully.');
+      setAddGuestUtorid('');
+
+      // Refresh event details so guests list & counts update
+      await fetchEventDetails({ showPageLoader: false });
+    } catch (err) {
+      console.error('Error adding guest:', err);
+      const errorMsg =
+        err.response?.data?.error || 'Failed to add guest. Please try again.';
+      setError(errorMsg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+
+
   /**
    * Handle organizer updating event details.
    * This uses PATCH /events/:eventId.
@@ -463,6 +550,8 @@ const EventDetailPage = () => {
 
 
 
+
+
   // Show full-page loading state
   if (loading) {
     return (
@@ -491,6 +580,8 @@ const EventDetailPage = () => {
 
   const status = getEventStatus(event.startTime, event.endTime);
   const canRSVP = !userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
+  const canAddGuest = userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
+  const canEditEvent = userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
 
 
   return (
@@ -609,12 +700,25 @@ const EventDetailPage = () => {
           )}
             
 
-          {/* RSVP Section */}
+          {/* User RSVP Section */}
           {renderRSVPSection(canRSVP, isRsvped, actionLoading, handleRSVP, handleCancelRSVP)}
+
+
+          {/* Organizer Add Guest Section (shown only to organizers) */}
+          <OrganizerAddGuestSection
+            canAddGuest={canAddGuest}
+            addGuestUtorid={addGuestUtorid}
+            setAddGuestUtorid={setAddGuestUtorid}
+            actionLoading={actionLoading}
+            handleAddGuest={handleAddGuest}
+          />
+
+          {/* Organizer Award Points Section */}
+
 
           {/* Organizers Edit Event Section */}
           <OrganizerEditEventSection
-            userIsOrganizer={userIsOrganizer}
+            canEditEvent={canEditEvent}
             showEditForm={showEditForm}
             toggleEditForm={handleToggleEditForm}
             editFormData={editFormData}

@@ -161,8 +161,8 @@ export const eventAPI = {
     }),
   
   // Add guest to event (organizer/manager/superuser)
-  addEventGuest: (eventId, userId) => 
-    apiClient.post(`/events/${eventId}/guests`, { userId }),
+  addEventGuest: (eventId, utorid) => 
+    apiClient.post(`/events/${eventId}/guests`, { utorid }),
   
   // Remove guest from event (organizer/manager/superuser)
   removeEventGuest: (eventId, userId) => 
