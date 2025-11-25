@@ -4,6 +4,78 @@ import { eventAPI } from '../api';
 import { useAuth } from '../hooks/useAuth';
 import './EventDetailPage.css';
 
+
+/**
+ * Format a datetime string into a readable label
+ * for display on the page.
+ */
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',  // e.g., "November"
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * Decide whether an event is upcoming, ongoing, or past,
+ * based on its start and end times.
+ */
+function getEventStatus(startTime, endTime) {
+  const now = new Date();
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  if (now < start) return 'upcoming';
+  if (now > end) return 'past';
+  return 'ongoing';
+}
+
+/**
+ * Render the RSVP section with correct buttons and messaging.
+ *
+ * @param {boolean} canRSVP - Whether the event is upcoming or ongoing.
+ * @param {boolean} isRsvped - Whether the current user already RSVP'd.
+ * @param {boolean} actionLoading - Whether an action is currently in progress.
+ * @param {function} handleRSVP - Callback for RSVP.
+ * @param {function} handleCancelRSVP - Callback for cancelling RSVP.
+ */
+function renderRSVPSection(canRSVP, isRsvped, actionLoading, handleRSVP, handleCancelRSVP) {
+  if (!canRSVP) return null;
+
+  return (
+    <div className="rsvp-section">
+      {isRsvped ? (
+        <div className="rsvp-confirmed">
+          <span className="rsvp-status">You have RSVP'd to this event</span>
+
+          <button
+            onClick={handleCancelRSVP}
+            disabled={actionLoading}
+            className="cancel-rsvp-btn"
+          >
+            {actionLoading ? 'Cancelling...' : 'Cancel RSVP'}
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={handleRSVP}
+          disabled={actionLoading}
+          className="rsvp-btn"
+        >
+          {actionLoading ? 'Processing...' : 'RSVP to this Event'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+
+
 const EventDetailPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -17,83 +89,97 @@ const EventDetailPage = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
+  const fetchEventDetails = async ({ showPageLoader = true } = {}) => {
+    try {
+      if (showPageLoader) {
         setLoading(true);
-        setError('');
-        
-        const eventResponse = await eventAPI.getEventById(eventId);
-        setEvent(eventResponse.data);
+      }
+      setError('');
 
-        // Try to fetch guests to check if current user is RSVP'd
-        try {
-          const guestsResponse = await eventAPI.getEventGuests(eventId);
-          const guestsList = guestsResponse.data || [];
-          setGuests(guestsList);
-          
-          // Check if current user is in the guests list
-          const userIsGuest = guestsList.some(guest => guest.utorid === user?.utorid);
+      // Fetch event details
+      const eventResponse = await eventAPI.getEventById(eventId);
+      const eventData = eventResponse.data;
+      setEvent(eventData);
 
-          setIsRsvped(userIsGuest);
-        } catch (guestsErr) {
-          // User might not have permission to view guests, that's ok
-          console.log('Could not fetch guests list');
-        }
+      // Try to fetch guests so we can determine if current user RSVP'd
+      try {
+        const guestsResponse = await eventAPI.getEventGuests(eventId);
+        const guestsList = guestsResponse.data || [];
+        setGuests(guestsList);
 
-      } catch (err) {
-        console.error('Error fetching event details:', err);
-        setError('Failed to load event details. Please try again later.');
-      } finally {
+        // Check if current user is in the guest list
+        const userIsGuest = guestsList.some(
+          (guest) => guest.utorid === user?.utorid
+        );
+        setIsRsvped(userIsGuest);
+      } catch (guestsErr) {
+        // This is not fatal: user might not have permission to view guests
+        console.log('Could not fetch guests list', guestsErr);
+      }
+    } catch (err) {
+      console.error('Error fetching event details:', err);
+      setError('Failed to load event details. Please try again later.');
+    } finally {
+      if (showPageLoader) {
         setLoading(false);
       }
-    };
+    }
+  };
 
-    fetchEventDetails();
+  // Initial fetch when component mounts or when eventId / user changes
+  useEffect(() => {
+    fetchEventDetails({ showPageLoader: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, user]);
 
+  /**
+   * Handle RSVP action for the current user.
+   * Shows button-level loading and updates the RSVP state.
+   */
   const handleRSVP = async () => {
-  setActionLoading(true);
-  setError('');
-  setSuccessMessage('');
+    setActionLoading(true);
+    setError('');
+    setSuccessMessage('');
 
-  try {
-    // try RSVP
-    await eventAPI.rsvpEvent(eventId);
-
-    // if successful, update state
-    setIsRsvped(true);
-    setSuccessMessage("Successfully RSVP'd to this event!");
-
-  } catch (err) {
-    console.error("Error RSVP'ing to event:", err);
-
-    const rawMsg = err.response?.data?.error;
-    const serverMsg = rawMsg?.toLowerCase() || "";
-
-    // fallback: if server says already on guest list, treat as RSVP success
-    if (serverMsg.includes("already") && serverMsg.includes("guest")) {
-      setIsRsvped(true);
-      setSuccessMessage("You have already RSVP'd to this event.");
-      setError('');
-    } else {
-      setError(rawMsg || "Failed to RSVP. Please try again.");
-    }
-
-  } finally {
-    setActionLoading(false);
-
-    // Regardless of success/failure, try to refresh event details
     try {
-      const eventResponse = await eventAPI.getEventById(eventId);
-      setEvent(eventResponse.data);
-    } catch {
-      console.warn("Could not refresh event details");
+      // try RSVP
+      await eventAPI.rsvpEvent(eventId);
+
+      // if successful, update state
+      setIsRsvped(true);
+      setSuccessMessage("Successfully RSVP'd to this event!");
+
+    } catch (err) {
+      console.error("Error RSVP'ing to event:", err);
+
+      const rawMsg = err.response?.data?.error;
+      const serverMsg = rawMsg?.toLowerCase() || "";
+
+      // fallback: if server says already on guest list, treat as RSVP success
+      if (serverMsg.includes("already") && serverMsg.includes("guest")) {
+        setIsRsvped(true);
+        setSuccessMessage("You have already RSVP'd to this event.");
+        setError('');
+      } else {
+        setError(rawMsg || "Failed to RSVP. Please try again.");
+      }
+
+    } finally {
+      setActionLoading(false);
+
+      // Regardless of success/failure, try to refresh event details
+      try {
+        const eventResponse = await eventAPI.getEventById(eventId);
+        setEvent(eventResponse.data);
+      } catch {
+        console.warn("Could not refresh event details");
+      }
     }
-  }
-};
+  };
 
-
+  /**
+   * Handle cancelling RSVP for the current user.
+   */
   const handleCancelRSVP = async () => {
     try {
       setActionLoading(true);
@@ -117,28 +203,7 @@ const EventDetailPage = () => {
     }
   };
 
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-
-  const getEventStatus = (startTime, endTime) => {
-    const now = new Date();
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (now < start) return "upcoming";
-    if (now > end) return "past";
-    return "ongoing";
-};
-
+  // Show full-page loading state
   if (loading) {
     return (
       <div className="page-container">
@@ -149,6 +214,7 @@ const EventDetailPage = () => {
     );
   }
 
+  // If we failed to load an event (e.g., 404)
   if (!event) {
     return (
       <div className="page-container">
@@ -162,9 +228,9 @@ const EventDetailPage = () => {
     );
   }
 
-  const status = getEventStatus(event.startTime, event.endTime);
 
-  const canRSVP = status === "upcoming" || status === "ongoing";
+  const status = getEventStatus(event.startTime, event.endTime);
+  const canRSVP = (status === 'upcoming' || status === 'ongoing');
 
 
   return (
@@ -235,7 +301,14 @@ const EventDetailPage = () => {
                 </div>
               )}
 
-              {event.pointsRemain !== undefined && event.pointsRemain > 0 && (
+              <div className="info-item">
+                <div className="info-content">
+                  <span className="info-label">Guests Registered</span>
+                  <span className="info-value">{event.numGuests || 0} people</span>
+                </div>
+              </div>
+
+              {event.pointsRemain !== undefined && event.pointsRemain >= 0 && (
                 <div className="info-item">
                   <div className="info-content">
                     <span className="info-label">Points Available</span>
@@ -247,30 +320,8 @@ const EventDetailPage = () => {
           </div>
 
           {/* RSVP Section */}
-          {canRSVP && (
-            <div className="rsvp-section">
-              {isRsvped ? (
-                <div className="rsvp-confirmed">
-                  <span className="rsvp-status">You have RSVP'd to this event</span>
-                  <button 
-                    onClick={handleCancelRSVP} 
-                    disabled={actionLoading}
-                    className="cancel-rsvp-btn"
-                  >
-                    {actionLoading ? 'Cancelling...' : 'Cancel RSVP'}
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  onClick={handleRSVP} 
-                  disabled={actionLoading}
-                  className="rsvp-btn"
-                >
-                  {actionLoading ? 'Processing...' : 'RSVP to this Event'}
-                </button>
-              )}
-            </div>
-          )}
+          {renderRSVPSection(canRSVP, isRsvped, actionLoading, handleRSVP, handleCancelRSVP)}
+
         </div>
       </div>
     </div>
