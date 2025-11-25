@@ -80,9 +80,14 @@ const EventDetailPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  
   
   const [event, setEvent] = useState(null);
   const [guests, setGuests] = useState([]);
+  const [organizers, setOrganizers] = useState([]);
+  const [userIsOrganizer, setUserIsOrganizer] = useState(false);
+
   const [isRsvped, setIsRsvped] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -90,41 +95,48 @@ const EventDetailPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   const fetchEventDetails = async ({ showPageLoader = true } = {}) => {
-    try {
-      if (showPageLoader) {
-        setLoading(true);
-      }
-      setError('');
-
-      // Fetch event details
-      const eventResponse = await eventAPI.getEventById(eventId);
-      const eventData = eventResponse.data;
-      setEvent(eventData);
-
-      // Try to fetch guests so we can determine if current user RSVP'd
-      try {
-        const guestsResponse = await eventAPI.getEventGuests(eventId);
-        const guestsList = guestsResponse.data || [];
-        setGuests(guestsList);
-
-        // Check if current user is in the guest list
-        const userIsGuest = guestsList.some(
-          (guest) => guest.utorid === user?.utorid
-        );
-        setIsRsvped(userIsGuest);
-      } catch (guestsErr) {
-        // This is not fatal: user might not have permission to view guests
-        console.log('Could not fetch guests list', guestsErr);
-      }
-    } catch (err) {
-      console.error('Error fetching event details:', err);
-      setError('Failed to load event details. Please try again later.');
-    } finally {
-      if (showPageLoader) {
-        setLoading(false);
-      }
+  try {
+    if (showPageLoader) {
+      setLoading(true);
     }
-  };
+    setError('');
+
+    // Fetch event details
+    const eventResponse = await eventAPI.getEventById(eventId);
+    const eventData = eventResponse.data;
+    console.log('Event data:', eventData);
+
+    setEvent(eventData);
+
+    // ===== Extract organizers from eventData.organizers =====
+    const organizersList = eventData.organizers || [];
+    setOrganizers(organizersList);
+
+    const isOrganizer = organizersList.some(
+      (org) => org.utorid === user?.utorid
+    );
+    setUserIsOrganizer(isOrganizer);
+
+    
+    // ===== Determine RSVP status from eventData.guests =====
+    const guestsList = eventData.guests || [];
+    setGuests(guestsList);
+
+    const userIsGuest = guestsList.some(
+      (guest) => guest.utorid === user?.utorid
+    );
+    setIsRsvped(userIsGuest);
+
+  } catch (err) {
+    console.error('Error fetching event details:', err);
+    setError('Failed to load event details. Please try again later.');
+  } finally {
+    if (showPageLoader) {
+      setLoading(false);
+    }
+  }
+};
+
 
   // Initial fetch when component mounts or when eventId / user changes
   useEffect(() => {
@@ -230,7 +242,7 @@ const EventDetailPage = () => {
 
 
   const status = getEventStatus(event.startTime, event.endTime);
-  const canRSVP = (status === 'upcoming' || status === 'ongoing');
+  const canRSVP = !userIsOrganizer && (status === 'upcoming' || status === 'ongoing');
 
 
   return (
@@ -308,6 +320,7 @@ const EventDetailPage = () => {
                 </div>
               </div>
 
+
               {event.pointsRemain !== undefined && event.pointsRemain >= 0 && (
                 <div className="info-item">
                   <div className="info-content">
@@ -316,6 +329,17 @@ const EventDetailPage = () => {
                   </div>
                 </div>
               )}
+
+              {event.pointsAwarded !== undefined && event.pointsAwarded >= 0 && (
+                <div className="info-item">
+                  <div className="info-content">
+                    <span className="info-label">Points Awarded</span>
+                    <span className="info-value points">{event.pointsAwarded} points</span>
+                  </div>
+                </div>
+              )}
+
+
             </div>
           </div>
 
