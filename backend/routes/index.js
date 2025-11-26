@@ -6,6 +6,7 @@ const usersRouter = require('./users');
 const transactionsRouter = require('./transactions');
 const eventsRouter = require('./events');
 const promotionsRouter = require('./promotions');
+const stripeRouter = require('./stripe');
 const { MethodNotAllowed } = require('../utils/errors');
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.use('/users', usersRouter);
 router.use('/transactions', transactionsRouter);
 router.use('/events', eventsRouter);
 router.use('/promotions', promotionsRouter);
+router.use('/stripe', stripeRouter);
 
 // If the endpoint does not support a particular method, return 405 Method Not Allowed
 const allRoutes = [
@@ -23,6 +25,7 @@ const allRoutes = [
   transactionsRouter,
   eventsRouter,
   promotionsRouter,
+  stripeRouter,
 ];
 
 allRoutes.forEach((r) => {
