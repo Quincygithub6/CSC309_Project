@@ -126,6 +126,18 @@ const Navbar = () => {
             {user.name}
           </Link>
           <span className="user-role">({user.role})</span>
+
+          {/* ⭐ Notification */}
+          <button 
+            className="notification-bell"
+            onClick={() => navigate("/notifications")}
+            aria-label="Notifications"
+          >
+            <span className="bell-icon">🔔</span>
+            {/* a hardcoded badge for demo; will replace with real count */}
+            {/* <span className="notification-badge">3</span> */}
+          </button>
+
           <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>
