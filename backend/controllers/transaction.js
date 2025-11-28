@@ -7,6 +7,9 @@ const {
   Forbidden,
 } = require('../utils/errors');
 
+const { sendNotification } = require("../utils/sendNotification");
+const { sendNotificationToMany } = require("../utils/sendNotification");
+
 /**
  * Calculates points for a purchase transaction.
  */
@@ -190,6 +193,29 @@ const createPurchase = async (req, res, next) => {
         }
       },
     });
+
+    const io = req.app.get("io");
+    console.log('>>> io in createPurchase:', !!io);
+
+    // Notify the user via WebSocket
+    // io.to(`user:${customer.id}`).emit("notification", {
+    //   type: "purchase_created",
+    //   message: `A purchase was created for you, you earned ${pointsAwarded} points.`,
+    //   transactionId: transaction.id,
+    //   spent,
+    //   createdAt: transaction.createdAt,
+    // });
+
+    // io.to(`user:${cashier.id}`).emit("notification", {
+    //   type: "purchase_created",
+    //   message: `You created a purchase for ${customer.utorid}, they earned ${pointsAwarded} points.`,
+    //   transactionId: transaction.id,
+    //   spent,
+    //   createdAt: transaction.createdAt,
+    // });
+    await sendNotification(customer.id, "success", `Your purchase earned ${pointsAwarded} points.`);
+    await sendNotification(cashier.id, "success", `You created a purchase for ${customer.utorid}, they earned ${pointsAwarded} points.`);
+
 
     res.status(201).json({
       id: transaction.id,
@@ -480,7 +506,28 @@ const createTransfer = async (req, res, next) => {
         data: { points: { increment: amount } }
       })
     ]);
-    
+
+    const io = req.app.get("io");
+    console.log('>>> io in createTransfer:', !!io);
+
+    // io.to(`user:${recipient.id}`).emit("notification", {
+    //   type: "notification",
+    //   message: `You received a transfer of ${amount} points from ${sender.utorid}.`,
+    //   transactionId: recipientTx.id,
+    //   amount,
+    //   createdAt: recipientTx.createdAt,
+    // });
+
+    // io.to(`user:${sender.id}`).emit("notification", {
+    //   type: "notification",
+    //   message: `You sent a transfer of ${amount} points to ${recipient.utorid}.`,
+    //   transactionId: senderTx.id,
+    //   amount: amount,
+    //   createdAt: senderTx.createdAt,
+    // });
+    await sendNotification(recipient.id, "success", `You received a transfer of ${amount} points from ${sender.utorid}.`);
+    await sendNotification(sender.id, "success", `You sent a transfer of ${amount} points to ${recipient.utorid}.`);
+
     res.status(201).json({
       id: senderTx.id, // Return sender's transaction ID
       sender: sender.utorid,
@@ -527,6 +574,18 @@ const createRedemption = async (req, res, next) => {
         processed: false,
       }
     });
+
+    const io = req.app.get("io");
+    console.log('>>> io in createRedemption:', !!io);
+    // io.to(`user:${user.id}`).emit("notification", {
+    //   type: "notification",
+    //   message: `You created a redemption request for ${amount} points.`,
+    //   transactionId: transaction.id,
+    //   amount,
+    //   createdAt: transaction.createdAt,
+    // });
+    await sendNotification(user.id, "info", `You created a redemption request for ${amount} points.`);
+
     
     res.status(201).json({
       id: transaction.id,
@@ -586,6 +645,17 @@ const processRedemption = async (req, res, next) => {
         }
       })
     ]);
+
+    const io = req.app.get("io");
+    console.log('>>> io in processRedemption:', !!io);  
+    // io.to(`user:${transaction.userId}`).emit("notification", {
+    //   type: "notification",
+    //   message: `Your redemption of ${transaction.amount} points has been processed by ${cashier.utorid}.`,
+    //   transactionId: updatedTransaction.id,
+    //   amount: -updatedTransaction.amount,
+    //   createdAt: updatedTransaction.createdAt,
+    // });
+    await sendNotification(transaction.userId, "success", `Your redemption of ${transaction.amount} points has been processed by ${cashier.utorid}.`);
 
     res.status(200).json({
       id: updatedTransaction.id,
@@ -752,6 +822,22 @@ const createEventTransaction = async (req, res, next) => {
       remark: t.remark,
       createdBy: creator.utorid
     })).reverse(); // Re-order to match creation
+
+    // ⭐ Send notifications
+    const guestUserIds = guestsToAward.map((g) => g.id);
+
+    await sendNotificationToMany(
+      guestUserIds,
+      "success",
+      `You were awarded ${amount} points for event "${event.name}".`
+    );
+
+    await sendNotification(
+      creator.id,
+      "success",
+      `You awarded ${amount} points to ${guestsToAward.length} guest(s) for event "${event.name}".`
+    );
+
     
     // Respond differently for single vs. multiple awards
     if (utorid) {

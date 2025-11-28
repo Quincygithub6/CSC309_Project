@@ -128,6 +128,63 @@
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
+.notification-toast {
+  position: fixed;
+  right: 20px;
+  top: 70px; 
+  background: #333;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.notification-bell {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.4rem;
+}
+
+.notification-bell:focus,
+.notification-bell:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.notification-bell {
+  border: none !important;
+}
+
+.notification-bell:hover {
+  background-color: rgba(255,255,255,0.08);
+  transform: scale(1.05);
+}
+
+
+.bell-icon {
+  line-height: 1;
+}
+
+/* 红点，如果想用 unreadCount 再打开 */
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+
+
 /* Responsive design */
 @media (max-width: 768px) {
   .mobile-menu-toggle {
