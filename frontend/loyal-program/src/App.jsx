@@ -33,6 +33,7 @@ import CreateRedemptionPage from './pages/CreateRedemptionPage';
 import MyRedemptionsPage from './pages/MyRedemptionsPage';
 import ProfilePage from './pages/ProfilePage';
 import SocketDebugPage from './pages/SocketDebugPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 const App = () => {
   return (
@@ -53,6 +54,7 @@ const App = () => {
               <Route element={<RequireAuth />}>
                 {/* Common routes for all authenticated users */}
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 
                 {/* Regular user routes */}
                 <Route element={<RequireRole allowedRoles={['regular', 'cashier', 'manager', 'superuser']} />}>

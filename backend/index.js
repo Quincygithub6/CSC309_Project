@@ -72,6 +72,8 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ error: 'Internal Server Error' });
 });
 
+const { setSocketIO } = require("./utils/sendNotification");
+
 
 // change original app.listen to the following:
 const httpServer = http.createServer(app);
@@ -86,23 +88,8 @@ const io = new Server(httpServer, {
   }
 });
 
-// // WebSocket logic
-// io.on("connection", (socket) => {
-//   console.log("🔌 New WebSocket client:", socket.id);
 
-//   // token is here
-//   console.log("Client token:", socket.handshake.auth?.token);
-
-//   // test event: frontend should receive this
-//   socket.emit("notification", {
-//     message: "Hello from WebSocket server!"
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("❌ Client disconnected:", socket.id);
-//   });
-// });
-
+setSocketIO(io);
 
 io.on("connection", (socket) => {
   const token = socket.handshake.auth?.token;
@@ -120,9 +107,9 @@ io.on("connection", (socket) => {
     console.log(`🔐 Socket ${socket.id} joined room ${room}`);
 
     // test message (only sent to the user themselves)
-    socket.emit("notification", {
-      message: "Hello from WebSocket server!"
-    });
+    // socket.emit("notification", {
+    //   message: "Hello from WebSocket server!"
+    // });
 
     socket.on("disconnect", () => {
       console.log("❌ WebSocket disconnected:", socket.id);

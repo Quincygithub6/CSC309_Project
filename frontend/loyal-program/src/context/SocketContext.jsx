@@ -7,7 +7,7 @@ const SocketContext = createContext(null);
 
 export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
-  const { token, isAuthenticated } = useAuth(); // get from Auth the login status
+  const { token, isAuthenticated, user } = useAuth(); // get from Auth the login status
 
   useEffect(() => {
     // if not authenticated or no token: disconnect existing socket
@@ -30,6 +30,15 @@ export function SocketProvider({ children }) {
     };
     // Note that the dependencies are isAuthenticated and token
   }, [isAuthenticated, token]);
+
+  // 2️⃣ After socket is created and authenticated, send auth event with user ID
+  useEffect(() => {
+    if (!socket || !isAuthenticated || !user) return;
+
+    console.log("🔐 Sending auth to socket:", user.id);
+    socket.emit("auth", user.id);
+
+  }, [socket, isAuthenticated, user]);
 
   return (
     <SocketContext.Provider value={{ socket }}>
