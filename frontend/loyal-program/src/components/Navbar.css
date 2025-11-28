@@ -61,6 +61,8 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
+  margin-right: -8px; 
+  margin-left: 15px;
 }
 
 .profile-link:hover {
@@ -72,7 +74,6 @@
   font-size: 0.85rem;
 }
 
-/* NEW: Styles for the Role Switcher Dropdown */
 .role-selector-wrapper {
   position: relative;
   display: inline-block;
@@ -80,29 +81,25 @@
 
 .role-select-minimal {
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Very subtle border */
-  border-radius: 4px;
-  color: #ecf0f1; /* Match navbar text */
+  border: none;
+  color: white;
   font-family: inherit;
-  font-size: 0.85rem; /* Match user-role size */
-  padding: 2px 5px;
+  font-size: 0.85rem;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s ease;
-  -webkit-appearance: none; /* Removes default arrow on some browsers for cleaner look */
+  
+  /* Remove default arrow */
+  -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  text-align: center;
+  text-align: left;
 }
 
-.role-select-minimal:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.role-select-minimal:focus {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: #fff;
+role-select-minimal:hover {
+  color: white;
+  background-color: transparent;
 }
 
 /* Ensure dropdown options are readable */
@@ -221,8 +218,6 @@
   font-size: 0.65rem;
   font-weight: bold;
 }
-
-
 
 /* Responsive design */
 @media (max-width: 768px) {
