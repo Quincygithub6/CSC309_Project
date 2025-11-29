@@ -49,7 +49,7 @@ const findUserByUtorid = async (utorid) => {
  * Helper function to build the common WHERE clause for transaction filtering.
  */
 const buildTransactionWhereClause = (query, extraWhere = {}) => {
-  const { name, createdBy, suspicious, promotionId, type, relatedId, amount, operator } = query;
+  const { name, createdBy, suspicious, promotionId, type, relatedId, amount, operator, remark } = query;
   const where = { ...extraWhere };
 
   if (name) {
@@ -77,6 +77,9 @@ const buildTransactionWhereClause = (query, extraWhere = {}) => {
   }
   if (amount !== undefined && operator) {
     where.amount = { [operator]: amount };
+  }
+  if (remark) {
+    where.remark = { contains: remark };
   }
 
   return where;
