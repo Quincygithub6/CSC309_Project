@@ -100,7 +100,7 @@ const Navbar = () => {
           <Link to="/cashier/process-redemption" className="nav-link" onClick={closeMobileMenu}>Process Redemption</Link>
           {/* <Link to="/cashier/scan" className="nav-link" onClick={closeMobileMenu}>Scan QR</Link>
           <Link to="/cashier/manual-award" className="nav-link" onClick={closeMobileMenu}>Manual Award</Link> */}
-          <Link to="/cashier/transactions" className="nav-link" onClick={closeMobileMenu}>Transactions</Link>
+          {/* <Link to="/cashier/transactions" className="nav-link" onClick={closeMobileMenu}>Transactions</Link> */}
         </>
       );
     }
