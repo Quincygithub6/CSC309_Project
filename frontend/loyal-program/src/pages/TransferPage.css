@@ -113,7 +113,16 @@
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  width: auto;
 }
+
+/* .form-group input[type="text"] {
+  width: auto;
+}
+
+.form-group input[type="number"] {
+  width: auto;
+} */
 
 .form-group input:focus {
   outline: none;
