@@ -23,16 +23,16 @@ const CashierDashboard = () => {
     try {
       setLoading(true);
       
-      const response = await transactionAPI.getTransactions({ 
-        limit: 10,
-        sortBy: 'createdAt', // FIX: sort by createdAt, not time
-        order: 'desc'
-      });
+      // const response = await transactionAPI.getTransactions({ 
+      //   limit: 10,
+      //   sortBy: 'createdAt', // FIX: sort by createdAt, not time
+      //   order: 'desc'
+      // });
       
-      const transactions = response.data?.results || response.data || [];
-      setRecentTransactions(transactions);
+      // const transactions = response.data?.results || response.data || [];
+      // setRecentTransactions(transactions);
       
-      calculateStats(transactions);
+      // calculateStats(transactions);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -100,7 +100,7 @@ const CashierDashboard = () => {
         <p className="role-badge">Cashier</p>
       </div>
 
-      <div className="stats-grid">
+      {/* <div className="stats-grid">
         <div className="stat-card">
           <h3>Today</h3>
           <div className="stat-value">{stats.todayCount}</div>
@@ -114,7 +114,7 @@ const CashierDashboard = () => {
           <div className="stat-label">Transactions</div>
           <div className="stat-points">{stats.weekPoints} points awarded</div>
         </div>
-      </div>
+      </div> */}
 
       <div className="quick-actions">
         <h2 className="section-title">Quick Actions</h2>
@@ -140,7 +140,7 @@ const CashierDashboard = () => {
         </div>
       </div>
 
-      <div className="recent-transactions">
+      {/* <div className="recent-transactions">
         <h2 className="section-title">Recent Transactions</h2>
         {recentTransactions.length === 0 ? (
           <p className="empty-message">No recent transactions</p>
@@ -158,10 +158,10 @@ const CashierDashboard = () => {
               <tbody>
                 {recentTransactions.map((tx) => (
                   <tr key={tx.id}>
-                    {/* FIX: Use createdAt */}
+                    
                     <td>{formatDate(tx.createdAt || tx.time)}</td>
                     
-                    {/* FIX: Use utorid directly */}
+                    
                     <td>{tx.utorid || (tx.user && tx.user.utorid) || 'Unknown'}</td>
                     
                     <td>
@@ -170,17 +170,18 @@ const CashierDashboard = () => {
                       </span>
                     </td>
 
-                    {/* FIX: Use amount instead of points */}
+                    
                     <td className={tx.amount > 0 ? 'positive' : 'negative'}>
                       {tx.amount > 0 ? '+' : ''}{tx.amount}
                     </td>
                   </tr>
-                ))}
+                ))
+                }
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

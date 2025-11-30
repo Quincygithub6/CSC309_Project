@@ -56,35 +56,38 @@ const CashierCreateUserPage = () => {
         <div className="form-group">
         <label>
           UTORid:
-          <input
+        </label>  
+        <input
             value={utorid}
             onChange={(e) => setUtorid(e.target.value)}
             required
-          />
-        </label>
+        />
+        
         </div>
 
         <div className="form-group">
         <label>
           Full Name:
-          <input
+        </label>  
+        <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-          />
-        </label>
+        />
+        
         </div>
 
         <div className="form-group">
         <label>
           Email:
-          <input
+        </label>  
+        <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-          />
-        </label>
+        />
+       
         </div>
 
         <button type="submit" className="submit-btn" disabled={loading}>

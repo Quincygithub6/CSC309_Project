@@ -105,7 +105,10 @@
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s;
+  width: auto;
 }
+
+
 
 .form-group input:focus:not(:disabled) {
   outline: none;
