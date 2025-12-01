@@ -105,14 +105,42 @@ const { setSocketIO } = require("./utils/sendNotification");
 const httpServer = http.createServer(app);
 
 // initialize socket.io
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: 'http://localhost:5173', // React dev server
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true
+//   }
+// });
+
+
+const allowedSocketOrigins = [
+  "http://localhost:5173",
+];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173', // React dev server
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }
+    origin: (origin, callback) => {
+     
+      if (!origin) return callback(null, true);
+
+      if (allowedSocketOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      if (origin.endsWith("csc309-project.pages.dev")) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS (socket.io)"), false);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  },
 });
+
 
 
 setSocketIO(io);
