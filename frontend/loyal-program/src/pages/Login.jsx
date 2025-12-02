@@ -100,13 +100,7 @@ const Login = () => {
         </form>
 
         <div className="auth-links">
-          <button 
-            type="button" 
-            className="link-button" 
-            onClick={() => navigate('/register')}
-          >
-            Register
-          </button>
+          
           <button 
             type="button" 
             className="link-button" 
@@ -120,7 +114,7 @@ const Login = () => {
           <p className="help-text">
             <strong>Test Accounts:</strong>
           </p>
-          <p className="help-text">Regular: user1 / Password123!</p>
+          <p className="help-text">Regular: user1-7 / Password123!</p>
           <p className="help-text">Cashier: cashier1 / Password123!</p>
           <p className="help-text">Manager: manager1 / Password123!</p>
           <p className="help-text">Superuser: superuser1 / Password123!</p>
