@@ -1,7 +1,7 @@
 # LoyaLog
 
 ## Project Introduction
-Loyalty Rewards is a full-stack loyalty program web application that provides end-to-end functionality for regular users, cashiers, managers, event organizers, and superusers.
+LoyaLog is a full-stack loyalty program web application that provides end-to-end functionality for regular users, cashiers, managers, event organizers, and superusers.
 The system is built with a React.js frontend and an Express + Prisma backend.
 
 The platform supports role-based access control, transaction logging, event management, promotions, and QR code generation/processing, all deployed on a publicly accessible production environment.
