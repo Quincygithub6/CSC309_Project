@@ -62,11 +62,6 @@ exports.validateCreatePromotion = [
       return next(BadRequest('endTime must be after startTime.'));
     }
 
-    // removed to try and fix 102. no change
-    // if (new Date(startTime) < new Date()) {
-    //   return next(BadRequest('startTime must not be in the past.'));
-    // }
-
     if (minSpending !== undefined && minSpending !== null) {
       if (typeof minSpending !== 'number' || minSpending <= 0) {
         return next(BadRequest('minSpending must be a positive number.'));
