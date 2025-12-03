@@ -48,9 +48,11 @@ There is a file called `.env` in the backend folder. This file has important set
 JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
 DATABASE_URL="file:./dev.db"
 PORT=3000
+STRIPE_SECRET_KEY=your_stripe_secret_key_change_this_in_production
+FRONTEND_BASE_URL=your_frontend_url
 ```
 
-Do not share the JWT_SECRET with anyone.
+Do not share the JWT_SECRET or STRIPE_SECRET_KEY with anyone.
 
 ### 2.4 Set Up the Database
 
@@ -104,7 +106,15 @@ npm install
 
 Wait for this to finish.
 
-### 3.3 Start the Frontend Server
+### 3.3 Set Up Environment Variables
+
+There is a file called `.env` in the frontend folder  as well. This file has important settings. You should check if it exists. If you need to create it, copy from `.env.example` or create a new file with these contents:
+
+```
+VITE_BACKEND_WS_URL="your_backend_url"
+```
+
+### 3.4 Start the Frontend Server
 
 Now start the frontend development server:
 
@@ -112,9 +122,9 @@ Now start the frontend development server:
 npm run dev
 ```
 
-The frontend will start and you will see a message with a URL, probably http://localhost:5173
+The frontend will start and you will see a message with a URL, for example http://localhost:5173
 
-### 3.4 Open the Application
+### 3.5 Open the Application
 
 Open your web browser and go to:
 
@@ -186,7 +196,7 @@ Make sure you have the correct Node.js version. Try deleting the `node_modules` 
 
 ## Deployment Information
 
-Our application is deployed online. The frontend and backend are hosted separately.
+Our application is deployed online with the environment variables listed above. The frontend and backend are hosted separately.
 
 ### Frontend Deployment
 We use Vercel to host the frontend. The deployed website will be available at the URL specified in WEBSITE.md file.
@@ -213,6 +223,17 @@ We use bcrypt to hash passwords securely. This is a local library, no external s
 The frontend is built with React and uses Vite as the build tool. These are development tools, no API keys needed.
 
 All these are standard open source packages and do not require any API keys or external accounts.
+
+### Resend
+We use Resend for email integration for reset password. Resend verifies domain records to confirm the legitimacy of the sender. However this creates a limitation to the use of this API in this project, since we do not own a domain, we can only send emails to the email address associated with the Resend API account.
+You can find out more here: https://resend.com/docs/api-reference/api-keys/create-api-key
+
+### Stripe
+We use stripe for payment integration for the donate us feature. This service requires an API key.
+You can find out more here: https://docs.stripe.com/keys
+
+### socket.io
+We use this Javascript library for implmenting live updates. 
 
 ## Notes
 
