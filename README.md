@@ -1,4 +1,4 @@
-# Loyalty Rewards
+# LoyaLog
 
 ## Project Introduction
 Loyalty Rewards is a full-stack loyalty program web application that provides end-to-end functionality for regular users, cashiers, managers, event organizers, and superusers.
