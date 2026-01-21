@@ -149,7 +149,7 @@ async function main() {
         description: `This is an ongoing event #${i}`,
         location: "BA 1130",
         startTime: new Date("2025-11-01T00:00:00"), // ⬅️ fixed start date
-        endTime: new Date("2025-12-31T23:59:59"),   // ⬅️ fixed end date
+        endTime: new Date("2026-12-31T23:59:59"),   // ⬅️ fixed end date
         capacity: 50,
         pointsAllocated: 500,
         published: true,
@@ -197,8 +197,8 @@ async function main() {
         name: `Upcoming Event ${i}`,
         description: `This is an upcoming event #${i}`,
         location: "BA 3000",
-        startTime: new Date("2026-01-01T00:00:00"), // ⬅️ fixed start date
-        endTime: new Date("2026-01-07T23:59:59"),   // ⬅️ fixed end date
+        startTime: new Date("2027-01-01T00:00:00"), // ⬅️ fixed start date
+        endTime: new Date("2027-01-07T23:59:59"),   // ⬅️ fixed end date
         capacity: 50,
         pointsAllocated: 300,
         published: true,
